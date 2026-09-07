@@ -2,7 +2,7 @@
 
 **WorldRun** is an open-source project for building programmable simulated worlds where different decision-making systems can observe the world, take actions, and change what happens over time.
 
-![[overview_architecture.png]]
+![overall architecture](overview_architecture.png)
 
 ---
 
