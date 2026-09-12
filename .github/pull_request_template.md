@@ -15,5 +15,5 @@
 
 ## Checklist
 - [ ] I tested my changes
-- [ ] I updated docs/comments when needed
+- [ ] I updated docs and comments when needed
 - [ ] I linked the related issue
