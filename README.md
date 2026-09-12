@@ -1,6 +1,14 @@
 # WorldRun
 
+![Status: Planning](https://img.shields.io/badge/Status-Planning-red)
+
+> [!WARNING]
+> **This repository is currently in the initial setup and planning stage.**
+> The project structure, scope, and roadmap are still being defined.
+
 **WorldRun** is an open-source project for building programmable simulated worlds where different decision-making systems can observe the world, take actions, and change what happens over time.
+
+![overall architecture](overview_architecture.png)
 
 ---
 
