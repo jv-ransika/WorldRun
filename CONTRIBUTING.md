@@ -36,13 +36,15 @@ git remote add upstream https://github.com/jv-ransika/WorldRun.git
 
 ## 4) Create a branch
 
-Create a new branch from the latest `main` branch:
+Create a new branch from the latest `dev` branch:
 
 ```bash
-git checkout main
-git pull upstream main
+git checkout dev
+git pull upstream dev
 git checkout -b <branch-name>
 ```
+
+`main` is the stable branch. Use `dev` for active contribution work unless a maintainer asks for a different target branch.
 
 ### Branch naming convention
 
@@ -93,7 +95,7 @@ Do not submit changes that you have not verified.
 When your branch is ready:
 
 1. Push your branch to your fork.
-2. Open a PR against `jv-ransika/WorldRun:main`.
+2. Open a PR against `jv-ransika/WorldRun:dev`.
 3. Reference the issue (for example: `Closes #4`).
 4. Add a clear summary:
    - what changed
