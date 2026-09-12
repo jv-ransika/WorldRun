@@ -2,22 +2,15 @@ name: Discord Notifications
 
 on:
   pull_request:
-    types: [opened, closed, reopened, ready_for_review, assigned, unassigned, labeled, unlabeled, review_requested]
+    types: [opened, closed, reopened]
   issues:
-    types: [opened, closed, reopened, assigned, unassigned, labeled, unlabeled]
+    types: [opened, closed, reopened]
   push:
     branches: [main, dev]
-  create: # Fires for new branches and tags (filtered below)
-  delete: # Fires for deleted branches and tags (filtered below)
-  fork:
 
 jobs:
   notify:
     runs-on: ubuntu-latest
-    # Skip tag create/delete events — only process branch operations
-    if: >
-      (github.event_name != 'create' && github.event_name != 'delete') ||
-      github.event.ref_type == 'branch'
 
     steps:
       - name: Send Discord Notification
@@ -60,50 +53,14 @@ jobs:
                   COLOR=3066993 # Green
                   ;;
                 closed)
-                  if [ "$MERGED" = "true" ]; then
-                    TITLE="PR #${PR_NUM} Merged into '${BASE}'"
-                    DESCRIPTION="**${ACTOR}**'s pull request was merged from \`${HEAD}\` into \`${BASE}\` in **${REPO_NAME}**."
-                    COLOR=10181046 # Purple
-                  else
-                    TITLE="PR #${PR_NUM} Closed (Unmerged)"
-                    DESCRIPTION="Pull request from \`${HEAD}\` into \`${BASE}\` was closed without merging in **${REPO_NAME}**."
-                    COLOR=15158332 # Red
+                  if [ "$MERGED" != "true" ]; then
+                    echo "Skipping unmerged PR close notification."
+                    exit 0
                   fi
-                  ;;
-                ready_for_review)
-                  TITLE="PR #${PR_NUM} Ready for Review"
-                  DESCRIPTION="**${ACTOR}** marked pull request into \`${BASE}\` as ready for review in **${REPO_NAME}**."
-                  COLOR=15844367 # Gold
-                  ;;
-                assigned)
-                  ASSIGNEE="${{ github.event.assignee.login }}"
-                  TITLE="PR #${PR_NUM} Assigned"
-                  DESCRIPTION="**${ACTOR}** assigned **${ASSIGNEE}** to pull request #${PR_NUM} in **${REPO_NAME}**."
-                  COLOR=3447003 # Blue
-                  ;;
-                unassigned)
-                  ASSIGNEE="${{ github.event.assignee.login }}"
-                  TITLE="PR #${PR_NUM} Unassigned"
-                  DESCRIPTION="**${ACTOR}** removed **${ASSIGNEE}** from pull request #${PR_NUM} in **${REPO_NAME}**."
-                  COLOR=9807270 # Grey
-                  ;;
-                labeled)
-                  LABEL="${{ github.event.label.name }}"
-                  TITLE="PR #${PR_NUM} Labeled"
-                  DESCRIPTION="**${ACTOR}** added label \`${LABEL}\` to pull request #${PR_NUM} in **${REPO_NAME}**."
-                  COLOR=15844367 # Gold
-                  ;;
-                unlabeled)
-                  LABEL="${{ github.event.label.name }}"
-                  TITLE="PR #${PR_NUM} Label Removed"
-                  DESCRIPTION="**${ACTOR}** removed label \`${LABEL}\` from pull request #${PR_NUM} in **${REPO_NAME}**."
-                  COLOR=9807270 # Grey
-                  ;;
-                review_requested)
-                  REVIEWER="${{ github.event.requested_reviewer.login }}"
-                  TITLE="Review Requested on PR #${PR_NUM}"
-                  DESCRIPTION="**${ACTOR}** requested a review from **${REVIEWER}** on pull request #${PR_NUM} in **${REPO_NAME}**."
-                  COLOR=15844367 # Gold
+
+                  TITLE="PR #${PR_NUM} Merged into '${BASE}'"
+                  DESCRIPTION="**${ACTOR}**'s pull request was merged from \`${HEAD}\` into \`${BASE}\` in **${REPO_NAME}**."
+                  COLOR=10181046 # Purple
                   ;;
               esac
               ;;
@@ -131,30 +88,6 @@ jobs:
                   DESCRIPTION="**${ACTOR}** closed issue #${ISSUE_NUM} in **${REPO_NAME}**."
                   COLOR=15158332 # Red
                   ;;
-                assigned)
-                  ASSIGNEE="${{ github.event.assignee.login }}"
-                  TITLE="Issue #${ISSUE_NUM} Assigned"
-                  DESCRIPTION="**${ACTOR}** assigned **${ASSIGNEE}** to issue #${ISSUE_NUM} in **${REPO_NAME}**."
-                  COLOR=3447003 # Blue
-                  ;;
-                unassigned)
-                  ASSIGNEE="${{ github.event.assignee.login }}"
-                  TITLE="Issue #${ISSUE_NUM} Unassigned"
-                  DESCRIPTION="**${ACTOR}** removed **${ASSIGNEE}** from issue #${ISSUE_NUM} in **${REPO_NAME}**."
-                  COLOR=9807270 # Grey
-                  ;;
-                labeled)
-                  LABEL="${{ github.event.label.name }}"
-                  TITLE="Issue #${ISSUE_NUM} Labeled"
-                  DESCRIPTION="**${ACTOR}** added label \`${LABEL}\` to issue #${ISSUE_NUM} in **${REPO_NAME}**."
-                  COLOR=15844367 # Gold
-                  ;;
-                unlabeled)
-                  LABEL="${{ github.event.label.name }}"
-                  TITLE="Issue #${ISSUE_NUM} Label Removed"
-                  DESCRIPTION="**${ACTOR}** removed label \`${LABEL}\` from issue #${ISSUE_NUM} in **${REPO_NAME}**."
-                  COLOR=9807270 # Grey
-                  ;;
               esac
               ;;
 
@@ -169,30 +102,6 @@ jobs:
               TITLE_URL="$COMPARE_URL"
               DESCRIPTION="**${ACTOR}** pushed ${COUNT} commit${PLURAL} to \`${BRANCH}\` in **${REPO_NAME}**."
               COLOR=3447003 # Blue
-              ;;
-
-            create)
-              BRANCH="${{ github.event.ref }}"
-              TITLE="New Branch Created: '${BRANCH}'"
-              TITLE_URL="https://github.com/${REPO}/tree/${BRANCH}"
-              DESCRIPTION="**${ACTOR}** created branch \`${BRANCH}\` in **${REPO_NAME}**."
-              COLOR=3066993 # Green
-              ;;
-
-            delete)
-              BRANCH="${{ github.event.ref }}"
-              TITLE="Branch Deleted: '${BRANCH}'"
-              TITLE_URL="$REPO_URL"
-              DESCRIPTION="**${ACTOR}** deleted branch \`${BRANCH}\` in **${REPO_NAME}**."
-              COLOR=15158332 # Red
-              ;;
-
-            fork)
-              FORK_URL="${{ github.event.forkee.html_url }}"
-              TITLE="Repository Forked"
-              TITLE_URL="$FORK_URL"
-              DESCRIPTION="**${ACTOR}** forked **${REPO_NAME}**."
-              COLOR=15844367 # Gold
               ;;
 
           esac
