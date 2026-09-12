@@ -5,8 +5,6 @@ on:
     types: [opened, closed, reopened]
   issues:
     types: [opened, closed, reopened]
-  push:
-    branches: [main, dev]
 
 jobs:
   notify:
@@ -89,19 +87,6 @@ jobs:
                   COLOR=15158332 # Red
                   ;;
               esac
-              ;;
-
-            push)
-              BRANCH="${GITHUB_REF#refs/heads/}"
-              COMPARE_URL="${{ github.event.compare }}"
-              COMMITS_JSON='${{ toJson(github.event.commits) }}'
-              COUNT=$(echo "$COMMITS_JSON" | jq 'length')
-              PLURAL=$([ "$COUNT" -eq 1 ] && echo "" || echo "s")
-
-              TITLE="New Commit${PLURAL} on '${BRANCH}'"
-              TITLE_URL="$COMPARE_URL"
-              DESCRIPTION="**${ACTOR}** pushed ${COUNT} commit${PLURAL} to \`${BRANCH}\` in **${REPO_NAME}**."
-              COLOR=3447003 # Blue
               ;;
 
           esac
