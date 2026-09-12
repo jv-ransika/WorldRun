@@ -84,6 +84,8 @@ WorldRun is being built incrementally.
 
 Each milestone will be divided into small GitHub issues so contributors can work on individual parts without needing to understand the entire project.
 
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) for the complete contribution workflow.
+
 The current focus is:
 
 > **Milestone 1 — Make the World Alive**
